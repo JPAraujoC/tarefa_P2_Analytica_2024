@@ -1,0 +1,184 @@
+#Tarefa_P2_2024-2 Analytica
+
+'''Questão 1 : Desenvolva um programa que leia inputs de horários no formato ‘hh:mm’
+(com zero à esquerda e em formato 24 horas: 06:50, 21:15) e retorne o menor ângulo
+entre os ponteiro de horas e minutos. Ao receber um input inválido o programa
+deve exibir um erro. Ao receber o input ‘f’, o programa encerra.'''
+
+def angulo_horas():
+  while True:
+    horario = input("insira um horário no formato 24h ou digite f para sair ")
+
+    #se for digitado F, o código irá parar.
+    if horario == 'f' :
+      print("Fim...")
+      break
+
+    #verificando se é um horario válido com 5 elementos hh : e mm
+    if len(horario) != 5 and horario[2] != ':':
+      print("Horário inválido , preencha no formato hh:mm, por exemplo, 21:39")
+      continue
+
+    #separando horas e minutos e verificando cada valor
+    try:
+      horas,minutos = horario.split(':')
+      horas = int(horas)
+      minutos = int(minutos)
+    except ValueError:
+      print("Horário inválido. Certifique-se de usar apenas números.")
+      continue
+
+    #limitando os valores das horas
+    if horas < 0 or horas >= 24 :
+      print("Horário inválido, com menos de 00 horas ou mais que 23.")
+      continue
+
+    #limitando os valores dos minutos
+    if minutos < 0 or minutos >=60 :
+      print("Horário inválido , minutos menores do que 00 ou maior que 59")
+
+    #calculando os ângulos
+    angulo_h = (horas % 12) * 30 #+ (minutos * 0.5) (como o ponteiro está exato sempre, essa parte ficou inútil)
+    angulo_m = minutos * 6
+    graus = abs(angulo_h - angulo_m)
+    menor_angulo = min(graus, 360 - graus)
+
+    #verificando se é menor que x angulo, e demonstrando o seu valor real
+    if menor_angulo <= 0:
+      print(f"O angulo é de 0°")
+    elif menor_angulo <= 90:
+      print(f"O angulo é menor que 90°, sendo o valor real {menor_angulo}°")
+    elif menor_angulo <= 180:
+      print(f"O angulo é menor que 180°, sendo o valor real {menor_angulo}°")
+    elif menor_angulo <= 270:
+      print(f"O angulo é menor que 270°, sendo o valor real {menor_angulo}°")
+    else:
+      print(f"O angulo é menor que 360°, sendo o valor real {menor_angulo}°")
+
+
+angulo_horas()
+
+'''
+Questão 2: No xadrez, cada casa é referenciada por uma letra e um número, representando
+as coordenadas dessa casa. O cavalo, em particular, só pode se mover duas casas
+para frente e uma para o lado. Desenvolva um programa que receba uma posição
+no tabuleiro de xadrez, representando a posição inicial de um cavalo, e imprima uma
+lista com todas as posições para as quais o cavalo pode se mover segundo essas regras.
+Como referência, temos representado na imagem um cavalo posicionado inicialmente
+em d4 e, nos pontos pretos, os possíveis locais para onde ele pode se movimentar a
+seguir. Ao receber um input inválido o programa deve exibir um erro. Ao receber o
+input ‘f’, o programa encerra.
+'''
+
+def posicao_cavalo():
+  while True :
+    posicao = input("qual é a posição do cavalo? ")
+
+    #digitando F , o código irá parar
+    if posicao == 'f': #cavalo foi de arrasta, aperte f no chat
+      print("Fim...")
+      break
+
+    #como diremos uma poição de linha coluna , teremos uma string de 2 elementos.
+    if len(posicao) != 2 :
+      print("Posição inválida, tente novamente")
+      continue
+
+    letra = posicao[0]
+    numero = posicao[1]
+    coluna = ['a','b','c','d','e','f','g','h']
+    linha =  [1,2,3,4,5,6,7,8]
+
+    if letra not in coluna:
+      print("Posição inválida, as posições vão de a até h.")
+      continue
+
+    if numero not in linha:
+      print("Posição inválida, as posições vão de 1 a 8")
+
+    linha_atual = int(numero)
+    linhas = []
+    deslocamentos = [-2 , -1 , 1 , 2]
+    for deslocamento in deslocamentos :
+      novo_num = int(posicao[1]) + deslocamento
+      if 1 <= novo_num <= 8:
+        linhas.append(novo_num)
+
+    # Lista de colunas possíveis após o movimento do cavalo
+    indice_coluna_atual = coluna.index(letra)
+    colunas = []
+    deslocamentos_colunas = [-2, -1, 1, 2]  # Deslocamentos possíveis do cavalo em L
+    for deslocamento in deslocamentos_colunas:
+        novo_indice = indice_coluna_atual + deslocamento
+        if 0 <= novo_indice < len(coluna):
+            colunas.append(coluna[novo_indice])
+
+    # Combinar colunas e linhas
+    movimentos = []
+    for letra_coluna in colunas:
+      for numero_linha in linhas:
+        if abs(coluna.index(letra_coluna) - indice_coluna_atual) + abs(numero_linha - linha_atual) == 3:
+            movimentos.append(letra_coluna + str(numero_linha))
+
+    print(f"Movimentos possíveis a partir de {posicao}: {', '.join(movimentos)}")
+
+posicao_cavalo()
+
+'''
+Questão 3 : Desenvolva um programa que receba um input de um número com duas casas
+decimais que representa um valor monetário. Ele deve calcular e retornar o menor
+número de notas e moedas possíveis no qual o valor pode ser decomposto e, em
+seguida, encerrar. São consideradas as notas de 100, 50, 20, 10, 5, 2 e as moedas de
+1, 0.50, 0.25, 0.10, 0.05 e 0.01. Nessa tarefa a apresentação dos valores deve ser igual
+a do exemplo. Ao receber um input inválido o programa deve exibir um erro.
+'''
+
+def trocado():
+    valor = float(input("Digite o valor total: "))
+    notas_e_moedas = [100,50,20,10,5,2,1,0.5,0.25,0.1,0.05,0.01]
+    contagem = {valor : 0 for valor in notas_e_moedas}
+
+    for nota_e_moeda in notas_e_moedas :
+      while valor >= nota_e_moeda:
+        valor -= nota_e_moeda
+        contagem[nota_e_moeda] += 1
+
+    for nota_e_moeda , quantidade in contagem.items():
+      if quantidade > 0 :
+        print(f'Quantidade de notas/moedas de {nota_e_moeda} foi de : {quantidade}')
+
+    print(f'Valor restante : {valor:.2f} reais')
+
+trocado()
+
+'''
+Questão 4 : Desenvolva um programa que leia inputs de números inteiros até receber o input
+‘f’. Nesse momento o programa vai calcular a frequência de cada um dos números
+e exibir na tela, no formato ‘O número n apareceu x vezes’. Ao receber um input
+inválido o programa deve ignorar o erro
+'''
+
+def contar_frequencia():
+    frequencia = {}
+
+    while True:
+        entrada = input("Digite um número inteiro ou 'f' para finalizar: ")
+        
+        #se apertar F, o programa vai de arrasta
+        if entrada == 'f':
+            break
+        
+        #os valores estão ou não no dicionário ?
+        try:
+            numero = int(entrada) 
+            if numero in frequencia:
+                frequencia[numero] += 1  # incrementa a frequência se o número já estiver no dicionário
+            else:
+                frequencia[numero] = 1  # adiciona o número no dicionário
+        except ValueError:
+            print(f"A entrada '{entrada}' não é um número válido. Tenta denovo aew")
+
+    for numero, contagem in frequencia.items():
+        print(f"O número {numero} apareceu {contagem} vezes.")
+
+contar_frequencia()
